@@ -25,7 +25,7 @@ class ahx_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: A
             indirectIndexedAddress = (((addressHigh.toInt() + 1) shl 8) + (zeroPageAddress.toInt() + cpu.indexXRegister.toInt())).toUShort();
         }
 
-        compareWithAccumulator(indirectIndexedAddress);
+        andAXHStoreMemory(indirectIndexedAddress);
     }
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_9F(){
@@ -40,7 +40,7 @@ class ahx_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: A
         } else {
             src = (((addressHigh.toInt() shl 8) + 1) + (addressLow.toInt() + cpu.indexYRegister.toInt())).toUShort();
         }
-        compareWithAccumulator(src);
+        andAXHStoreMemory(src);
     }
 
     //increments the program counter by 1 after a memory fetch operation using the program counter is performed
@@ -48,18 +48,7 @@ class ahx_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: A
         cpu.programCounterRegister = (cpu.programCounterRegister + 1u).toUShort();
     }
 
-    fun compareWithAccumulator(address: UShort){
-        val src: UByte = cpu.ram[address.toInt()];
-        val sub: Int = cpu.accumulatorRegister.toInt() - src.toInt();
-        if(sub == 0){
-            cpu.setZeroFlag(1u);
-        } else if (sub < 0){
-            cpu.setCarryFlag(0u);
-            cpu.setZeroFlag(0u);
-            cpu.setNegativeFlag(1u);
-        } else {
-            cpu.setCarryFlag(1u);
-            cpu.setZeroFlag(0u);
-        }
+    fun andAXHStoreMemory(address: UShort){
+        cpu.ram[address.toInt()] = cpu.accumulatorRegister and cpu.indexXRegister and cpu.ram[addressHigh.toInt()]
     }
 }

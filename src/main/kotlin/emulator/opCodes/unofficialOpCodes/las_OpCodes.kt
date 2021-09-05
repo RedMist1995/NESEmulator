@@ -26,7 +26,7 @@ public class las_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
             src = (((addressHigh.toInt() shl 8) + 1) + (addressLow.toInt() + cpu.indexYRegister.toInt())).toUShort();
         }
         loadAccumulator(src);
-        loadIntoX(src)
+        andMemorySPStoreAXSP(src)
     }
 
     //increments the program counter by 1 after a memory fetch operation using the program counter is performed
@@ -38,25 +38,21 @@ public class las_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
         cpu.accumulatorRegister = cpu.ram[memory.toInt()];
     }
 
-    fun loadIntoX(memory: UShort?){
-        if(memory == null){
-            if(cpu.opCode.toUInt() == 0xAAu){
-                cpu.indexXRegister = cpu.accumulatorRegister
-            } else {
-                cpu.indexXRegister = cpu.stackPointerRegister
-            }
-        } else {
-            cpu.indexXRegister = cpu.ram[memory.toInt()]
-        }
-        if(cpu.indexXRegister.toUInt() == 0u){
+    fun andMemorySPStoreAXSP(memory: UShort){
+        val temp: UByte = cpu.stackPointerRegister and cpu.ram[memory.toInt()]
+        cpu.accumulatorRegister = temp
+        cpu.indexXRegister = temp
+        cpu.stackPointerRegister = temp
+        if(temp.toUInt() == 0u){
             cpu.setZeroFlag(1u)
         } else {
             cpu.setZeroFlag(0u)
         }
-        if((cpu.indexXRegister.toUInt() and 128u) != 0u){
+
+        if(temp.toUInt() and 128u != 0u){
             cpu.setNegativeFlag(1u)
         } else {
-            cpu.setZeroFlag(0u)
+            cpu.setNegativeFlag(0u)
         }
     }
 }

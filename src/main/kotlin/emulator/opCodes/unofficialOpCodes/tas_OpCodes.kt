@@ -39,6 +39,7 @@ class tas_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: A
     //memory.
     fun tasOperation(address: UShort){
         cpu.stackPointerRegister = cpu.accumulatorRegister and cpu.indexXRegister
-
+        val temp: UByte = cpu.stackPointerRegister and cpu.ram[addressHigh.toInt() + 1]
+        cpu.ram[address.toInt()] = temp
     }
 }
