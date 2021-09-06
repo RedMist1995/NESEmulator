@@ -5,7 +5,7 @@ import emulator.hardware.CPU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public class lda_OpCodes (private val cpu: CPU, private val ppu: PPU, private val apu: APU) {
+public class lda_OpCodes (private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 
@@ -14,7 +14,7 @@ public class lda_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
     //Indexed Indirect
     fun OP_A1(){
         val bal: UByte = cpu.ram[cpu.programCounterRegister.toInt()];//pc+1 initial low address from OP Parameter
-        incrementProgramCounter();//pc+2
+        cpu.incrementProgramCounter();//pc+2
         var zeroPageAddress: UShort = (bal + cpu.indexXRegister + 1u).toUShort(); //creates a zero pages stand in BAL and is the real low address byte if under FF
         if(zeroPageAddress > 0xFFu) {
             zeroPageAddress = (zeroPageAddress - 0x100u).toUShort();//creates the real low address byte if over FF by stripping the carry and wrapping to the low zero page address
@@ -26,22 +26,22 @@ public class lda_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
     //Zero Page Addressing - assumes Address High to be 0x00
     fun OP_A5(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
         val zeroPageAddress: UShort = addressLow.toUShort();
         loadAccumulator(zeroPageAddress);
     }
     //Immediate Addressing - Doesn't pull data from memory, uses OP Parameter as data
     fun OP_A9(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
         loadAccumulator(addressLow.toUShort());
     }
     //Absolute Addressing - Pulls addressLow and addressHigh from OP Params 1 and 2, combines to make 16bit mem address to pull data from
     fun OP_AD(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
         addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+2
-        incrementProgramCounter(); //pc+3
+        cpu.incrementProgramCounter(); //pc+3
 
         val src: UShort = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort();
         loadAccumulator(src);
@@ -49,7 +49,7 @@ public class lda_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
     //Indirect Indexed
     fun OP_B1(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()];//pc + 1 initial low address from OP Code Parameter
-        incrementProgramCounter();//pc + 2
+        cpu.incrementProgramCounter();//pc + 2
         val zeroPageAddress: UShort = (addressLow + 1u).toUShort();
         val indirectIndexedAddress: UShort;
         if(zeroPageAddress <= 0xFFu){
@@ -65,7 +65,7 @@ public class lda_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
     //Zero Page Indexed Addressing - only index x is allowed with Zero Page indexing, and regardless of a carry with the addressLow + indexX the high address will always be 0x0000
     fun OP_B5(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()];//pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
 
         val zeroPageAddress: UShort
         val addressSpace: UShort = (addressLow + cpu.indexXRegister).toUShort();
@@ -74,15 +74,15 @@ public class lda_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
         } else {
             zeroPageAddress = (addressSpace - 0x100u).toUShort();//pc+2
         }
-        incrementProgramCounter();//pc+3
+        cpu.incrementProgramCounter();//pc+3
         loadAccumulator(zeroPageAddress);
     }
     //Absolute X Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_B9(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()];//pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
         addressHigh = cpu.ram[cpu.programCounterRegister.toInt()];//pc+2
-        incrementProgramCounter();//pc+3
+        cpu.incrementProgramCounter();//pc+3
 
         val src: UShort;
 
@@ -96,9 +96,9 @@ public class lda_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_BD(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()];//pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
         addressHigh = cpu.ram[cpu.programCounterRegister.toInt()];//pc+2
-        incrementProgramCounter();//pc+3
+        cpu.incrementProgramCounter();//pc+3
 
         val src: UShort;
         if((addressLow + cpu.indexXRegister) <= 0xFFu) {
@@ -109,10 +109,7 @@ public class lda_OpCodes (private val cpu: CPU, private val ppu: PPU, private va
         loadAccumulator(src);
     }
 
-    //increments the program counter by 1 after a memory fetch operation using the program counter is performed
-    private fun incrementProgramCounter(){
-        cpu.programCounterRegister = (cpu.programCounterRegister + 1u).toUShort();
-    }
+    
 
     fun loadAccumulator(memory: UShort){
         cpu.accumulatorRegister = cpu.ram[memory.toInt()];

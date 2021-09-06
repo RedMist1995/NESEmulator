@@ -5,7 +5,7 @@ import emulator.hardware.CPU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class tas_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: APU) {
+class tas_OpCodes(private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 
@@ -14,9 +14,9 @@ class tas_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: A
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_8B(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()];//pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
         addressHigh = cpu.ram[cpu.programCounterRegister.toInt()];//pc+2
-        incrementProgramCounter();//pc+3
+        cpu.incrementProgramCounter();//pc+3
 
         val src: UShort;
         if((addressLow + cpu.indexXRegister) <= 0xFFu) {
@@ -27,10 +27,7 @@ class tas_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: A
         tasOperation(src);
     }
 
-    //increments the program counter by 1 after a memory fetch operation using the program counter is performed
-    private fun incrementProgramCounter(){
-        cpu.programCounterRegister = (cpu.programCounterRegister + 1u).toUShort();
-    }
+    
 
     //No Good Method Name. This opcode ANDs the contents of the A and X registers (without changing
     //the contents of either register) and transfers the result to the stack

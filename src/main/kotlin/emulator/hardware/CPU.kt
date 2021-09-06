@@ -26,6 +26,7 @@ class CPU {
 
     //Current Op Code
     var opCode: UByte = 0u;
+    var stackStart: UShort = 0x01FFu
 
     //Processor Status Flags
 //    carryFlag = [0];
@@ -33,7 +34,7 @@ class CPU {
 //    interruptDisableFlag = [2];
 //    decimalModeFlag = [3]; shouldn't be used in the NES
 //    breakCommandFlag = [4];
-//    Index 5 not used, expected to be 1 at all time
+//    expansionBit = [5]; Should never be used, assumed to be 1 at all times
 //    overflowFlag = [6];
 //    negativeFlag = [7];
     var processorStatusArray = UByteArray(8)
@@ -97,7 +98,7 @@ class CPU {
     fun resetOverflowFlag(){
         processorStatusArray[6] = 0u;
     }
-    fun getResetOverflowFlag(): UByte{
+    fun getOverflowFlag(): UByte{
         return processorStatusArray[6];
     }
 
@@ -109,5 +110,18 @@ class CPU {
     }
     fun getNegativeFLag(): UByte{
         return processorStatusArray[7];
+    }
+
+    //increments the program counter by 1 after a memory fetch operation using the program counter is performed
+    fun incrementProgramCounter(){
+        programCounterRegister = (programCounterRegister + 1u).toUShort();
+    }
+
+    fun decrementStackPointer(){
+        stackPointerRegister = (stackPointerRegister - 1u).toUByte();
+    }
+
+    fun incrementStackPointer(){
+        stackPointerRegister = (stackPointerRegister + 1u).toUByte();
     }
 }

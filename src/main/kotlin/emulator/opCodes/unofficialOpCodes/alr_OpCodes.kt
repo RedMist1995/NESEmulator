@@ -5,7 +5,7 @@ import emulator.hardware.CPU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class alr_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: APU) {
+class alr_OpCodes(private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 
@@ -14,15 +14,12 @@ class alr_OpCodes(private val cpu: CPU, private val ppu: PPU, private val apu: A
     //Immediate Addressing - Doesn't pull data from memory, uses OP Parameter as data
     fun OP_4B(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
         andWithAccumulator(addressLow.toUShort());
         logicalShiftRight()
     }
 
-    //increments the program counter by 1 after a memory fetch operation using the program counter is performed
-    private fun incrementProgramCounter(){
-        cpu.programCounterRegister = (cpu.programCounterRegister + 1u).toUShort();
-    }
+
 
     fun andWithAccumulator(address: UShort){
         val src: UByte = cpu.ram[address.toInt()];

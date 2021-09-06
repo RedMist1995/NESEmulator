@@ -5,7 +5,7 @@ import emulator.hardware.CPU;
 import emulator.hardware.PPU;
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class anc_OpCodes(private val cpu: CPU, private val ppu:PPU, private val apu:APU) {
+class anc_OpCodes(private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 
@@ -14,15 +14,12 @@ class anc_OpCodes(private val cpu: CPU, private val ppu:PPU, private val apu:APU
     //Immediate Addressing - Doesn't pull data from memory, uses OP Parameter as data
     fun OP_0B(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+1
-        incrementProgramCounter(); //pc+2
+        cpu.incrementProgramCounter(); //pc+2
         andWithAccumulator(addressLow.toUShort());
         arithmeticRotateLeft(addressLow.toUShort())
     }
 
-    //increments the program counter by 1 after a memory fetch operation using the program counter is performed
-    private fun incrementProgramCounter(){
-        cpu.programCounterRegister = (cpu.programCounterRegister + 1u).toUShort();
-    }
+    
 
     fun andWithAccumulator(address: UShort){
         val src: UByte = cpu.ram[address.toInt()];
@@ -47,13 +44,13 @@ class anc_OpCodes(private val cpu: CPU, private val ppu:PPU, private val apu:APU
         if(temp.toUInt() and 128u != 0u){
             cpu.setNegativeFlag(1u)
         } else {
-            cpu.setNegativeFlag(0u)
+            cpu.resetNegativeFlag()
         }
 
         if(temp.toUInt() == 0u){
             cpu.setZeroFlag(1u)
         } else {
-            cpu.setZeroFlag(0u)
+            cpu.resetZeroFlag()
         }
     }
 }
