@@ -43,8 +43,6 @@ class ahx_OpCodes(private val cpu: CPU) {
         andAXHStoreMemory(src);
     }
 
-    
-
     fun andAXHStoreMemory(address: UShort){
         cpu.ram[address.toInt()] = cpu.accumulatorRegister and cpu.indexXRegister and cpu.ram[addressHigh.toInt()]
     }

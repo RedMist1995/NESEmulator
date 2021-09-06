@@ -57,23 +57,6 @@ public class stx_OpCodes (private val cpu: CPU) {
     fun OP_9A(){
         storeXInto(null)
     }
-    //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
-    fun OP_9E(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()];//pc+1
-        cpu.incrementProgramCounter(); //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()];//pc+2
-        cpu.incrementProgramCounter();//pc+3
-
-        val src: UShort;
-        if((addressLow + cpu.indexXRegister) <= 0xFFu) {
-            src = ((addressHigh.toInt() shl 8) + (addressLow.toInt() + cpu.indexYRegister.toInt())).toUShort();
-        } else {
-            src = (((addressHigh.toInt() shl 8) + 1) + (addressLow.toInt() + cpu.indexYRegister.toInt())).toUShort();
-        }
-        storeXInto(src);
-    }
-
-    
 
     fun storeXInto(memory: UShort?){
         if(memory == null){
