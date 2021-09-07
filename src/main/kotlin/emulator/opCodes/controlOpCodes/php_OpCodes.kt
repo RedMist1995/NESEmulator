@@ -15,5 +15,6 @@ open class php_OpCodes(private val cpu: CPU) {
         }
         cpu.ram[(cpu.stackStart - cpu.stackPointerRegister).toInt()] = processorStatus
         cpu.incrementStackPointer()
+        cpu.incrementClockCycle(3)
     }
 }

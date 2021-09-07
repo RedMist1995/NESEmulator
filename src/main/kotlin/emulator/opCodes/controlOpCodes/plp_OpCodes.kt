@@ -14,5 +14,6 @@ open class plp_OpCodes(private val cpu: CPU) {
             cpu.processorStatusArray[i] = ((stackProcessorStatus.toInt() shr i) and 0x01).toUByte()
         }
         cpu.decrementStackPointer()
+        cpu.incrementClockCycle(4)
     }
 }

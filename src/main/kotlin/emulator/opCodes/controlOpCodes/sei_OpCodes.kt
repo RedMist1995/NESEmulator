@@ -12,5 +12,6 @@ open class sei_OpCodes(private val cpu: CPU) {
     //OP Codes - SEI Group
     fun OP_61(){
         cpu.setInterruptDisableFlag(1u)
+        cpu.incrementClockCycle(2)
     }
 }

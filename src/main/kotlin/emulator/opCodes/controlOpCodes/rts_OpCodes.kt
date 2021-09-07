@@ -14,5 +14,6 @@ public open class rts_OpCodes (private val cpu: CPU) {
         cpu.decrementStackPointer()
         val pcHigh: UByte = cpu.ram[(cpu.stackStart + cpu.stackPointerRegister).toInt()]
         cpu.programCounterRegister = ((pcHigh.toInt() shl 8) + pcLow.toInt() + 1).toUShort()
+        cpu.incrementClockCycle(6)
     }
 }

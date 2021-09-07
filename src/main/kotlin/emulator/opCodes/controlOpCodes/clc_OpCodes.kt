@@ -10,5 +10,6 @@ open class clc_OpCodes(private val cpu: CPU) {
     //OP Codes - CLC Group
     fun OP_18() {
         cpu.resetCarryFlag()
+        cpu.incrementClockCycle(2)
     }
 }

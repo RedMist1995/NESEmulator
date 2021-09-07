@@ -12,5 +12,6 @@ open class cli_OpCodes(private val cpu: CPU) {
     //OP Codes - CLI Group
     fun OP_58(){
         cpu.resetInterruptDisableFlag()
+        cpu.incrementClockCycle(2)
     }
 }

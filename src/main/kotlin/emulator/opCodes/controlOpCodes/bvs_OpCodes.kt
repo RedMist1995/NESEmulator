@@ -14,8 +14,20 @@ open class bvs_OpCodes(private val cpu: CPU) {
     //Indexed Indirect
     fun OP_70(){
         if(cpu.getOverflowFlag().toUInt() == 1u) {
-            cpu.programCounterRegister =
-                (cpu.programCounterRegister + cpu.ram[cpu.programCounterRegister.toInt()]).toUShort()
+            val temp: UByte = cpu.ram[cpu.programCounterRegister.toInt()]
+            val newPC: UShort
+            if(temp.toUInt() and 128u != 0u) {
+                val posTemp: UByte = (temp.inv() + 1u).toUByte()
+                newPC = (cpu.programCounterRegister - posTemp).toUShort()
+            } else {
+                newPC = (cpu.programCounterRegister + temp).toUShort()
+            }
+            if((newPC.toUInt()/256u) == (cpu.programCounterRegister.toUInt()/256u)){
+                cpu.incrementClockCycle(3)
+            } else {
+                cpu.incrementClockCycle(4)
+            }
+            cpu.programCounterRegister = newPC
         }
     }
 }

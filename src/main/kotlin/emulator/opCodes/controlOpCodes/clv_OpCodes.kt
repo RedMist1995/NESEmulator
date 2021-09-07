@@ -12,5 +12,6 @@ open class clv_OpCodes(private val cpu: CPU) {
     //OP Codes - CLV Group
     fun OP_B8(){
         cpu.resetOverflowFlag()
+        cpu.incrementClockCycle(2)
     }
 }

@@ -16,5 +16,6 @@ public open class rti_OpCodes(private val cpu: CPU) {
         addressHigh = cpu.ram[(cpu.stackStart - cpu.stackPointerRegister).toInt()]
         cpu.decrementStackPointer()
         cpu.programCounterRegister = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort()
+        cpu.incrementClockCycle(6)
     }
 }

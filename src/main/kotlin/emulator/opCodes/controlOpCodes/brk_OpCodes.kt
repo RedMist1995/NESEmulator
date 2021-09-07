@@ -22,6 +22,6 @@ open class brk_OpCodes(private val cpu: CPU) {
         cpu.incrementStackPointer()
         cpu.setInterruptDisableFlag(1u)
         cpu.programCounterRegister = ((cpu.ram[0xFFFF].toInt() shl 8) + cpu.ram[0xFFFE].toInt()).toUShort()
-
+        cpu.incrementClockCycle(7)
     }
 }

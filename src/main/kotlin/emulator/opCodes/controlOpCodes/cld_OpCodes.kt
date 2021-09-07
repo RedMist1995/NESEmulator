@@ -12,5 +12,6 @@ open class cld_OpCodes(private val cpu: CPU) {
     //OP Codes - CLD Group
     fun OP_D8(){
         cpu.resetDecimalModeFlag()
+        cpu.incrementClockCycle(2)
     }
 }

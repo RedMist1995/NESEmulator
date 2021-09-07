@@ -17,6 +17,7 @@ open class jmp_OpCodes(private val cpu: CPU) {
         cpu.programCounterRegister = (cpu.programCounterRegister + 1u).toUShort()
         addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]
         cpu.programCounterRegister = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort()
+        cpu.incrementClockCycle(3)
     }
 
     //Indirect Addressing
@@ -26,5 +27,6 @@ open class jmp_OpCodes(private val cpu: CPU) {
         addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]
         val newProgramCounter: UShort = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort()
         cpu.programCounterRegister = cpu.ram[newProgramCounter.toInt()].toUShort()
+        cpu.incrementClockCycle(5)
     }
 }

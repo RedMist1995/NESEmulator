@@ -21,6 +21,7 @@ open class jsr_OpCodes(private val cpu: CPU) {
         cpu.ram[(cpu.stackStart - cpu.stackPointerRegister).toInt()] = ((currentPC.toInt()) and 0xFF).toUByte()
         cpu.incrementStackPointer()
         cpu.programCounterRegister = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort() //creates the final indexed indirect address
+        cpu.incrementClockCycle(6)
     }
 
 }

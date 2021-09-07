@@ -13,5 +13,6 @@ open class pla_OpCodes(private val cpu: CPU) {
     fun OP_68(){
         cpu.accumulatorRegister = cpu.ram[(cpu.stackStart - cpu.stackPointerRegister).toInt()]
         cpu.decrementStackPointer()
+        cpu.incrementClockCycle(4)
     }
 }

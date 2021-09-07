@@ -11,5 +11,6 @@ open class sed_OpCodes(private val cpu: CPU) {
 
     fun OP_F8(){
         cpu.setDecimalModeFlag(1u)
+        cpu.incrementClockCycle(2)
     }
 }

@@ -13,5 +13,6 @@ open class pha_OpCodes(private val cpu: CPU) {
     fun OP_48(){
         cpu.ram[(cpu.stackStart - cpu.stackPointerRegister).toInt()] = cpu.accumulatorRegister
         cpu.incrementStackPointer()
+        cpu.incrementClockCycle(3)
     }
 }

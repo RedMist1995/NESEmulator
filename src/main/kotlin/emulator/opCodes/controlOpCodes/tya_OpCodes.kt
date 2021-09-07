@@ -24,5 +24,6 @@ open class tya_OpCodes(private val cpu: CPU) {
         } else {
             cpu.resetNegativeFlag()
         }
+        cpu.incrementClockCycle(2)
     }
 }

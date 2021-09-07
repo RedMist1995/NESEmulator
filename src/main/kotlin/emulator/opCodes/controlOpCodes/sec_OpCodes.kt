@@ -12,5 +12,6 @@ open class sec_OpCodes(private val cpu: CPU) {
     //OP Codes - SEC Group
     fun OP_38(){
         cpu.setCarryFlag(1u)
+        cpu.incrementClockCycle(2)
     }
 }
