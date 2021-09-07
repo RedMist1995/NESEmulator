@@ -3,7 +3,7 @@ package emulator.opCodes.unofficialOpCodes;
 import emulator.hardware.CPU;
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class shy_OpCodes(private val cpu: CPU) {
+open class shy_OpCodes(private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 

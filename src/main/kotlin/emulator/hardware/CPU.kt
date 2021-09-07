@@ -1,6 +1,6 @@
 package emulator.hardware;
 @OptIn(ExperimentalUnsignedTypes::class)
-class CPU {
+open class CPU() {
     //CPU Components
     //Memory Map (64kB of Memory - Addresses $0000 to $FFFF)
     //$0000 to $1FFF is work memory
@@ -11,12 +11,6 @@ class CPU {
     //$8000 to $FFFF is prog rom
     var ram = UByteArray(65535)
 
-//    uInt8[] cpuRam = new uInt8[Short.decode("0x2000")];
-//    uInt8[] ioRegister = new uInt8[Short.decode("0x2020")];
-//    uInt8[] expansionRom = new uInt8[Short.decode("0x1FE0")];
-//    uInt8[] saveRam = new uInt8[Short.decode("0x2000")];
-//    uInt8[] prgRom = new uInt8[Short.decode("0x8000")];
-
     //CPU Registers
     var programCounterRegister: UShort = 0u
     var stackPointerRegister: UByte = 0u;
@@ -26,6 +20,8 @@ class CPU {
 
     //Current Op Code
     var opCode: UByte = 0u;
+
+    //Stack starts at highest section of memory allocated for stack
     var stackStart: UShort = 0x01FFu
 
     //Processor Status Flags

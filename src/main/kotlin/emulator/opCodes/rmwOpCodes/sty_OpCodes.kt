@@ -3,14 +3,31 @@ package emulator.opCodes.rmwOpCodes;
 import emulator.hardware.CPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public class sty_OpCodes (private val cpu: CPU) {
+public open class sty_OpCodes (private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 
     //OP Codes - STY Group
     //Addressing Modes
+    //Zero Page Addressing - assumes Address High to be 0x00
+    fun OP_84(){
+        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+1
+        cpu.incrementProgramCounter(); //pc+2
+        val zeroPageAddress: UShort = addressLow.toUShort();
+        storeYInto(zeroPageAddress);
+    }
+    //Absolute Addressing - Pulls addressLow and addressHigh from OP Params 1 and 2, combines to make 16bit mem address to pull data from
+    fun OP_8C(){
+        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+1
+        cpu.incrementProgramCounter(); //pc+2
+        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]; //pc+2
+        cpu.incrementProgramCounter(); //pc+3
+
+        val src: UShort = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort();
+        storeYInto(src);
+    }
     //Zero Page Indexed Addressing - only index x is allowed with Zero Page indexing, and regardless of a carry with the addressLow + indexY the high address will always be 0x0000
-    fun OP_95(){
+    fun OP_94(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()];//pc+1
         cpu.incrementProgramCounter(); //pc+2
 

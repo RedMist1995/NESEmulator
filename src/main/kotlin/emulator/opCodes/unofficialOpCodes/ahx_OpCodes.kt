@@ -5,7 +5,7 @@ import emulator.hardware.CPU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class ahx_OpCodes(private val cpu: CPU) {
+open class ahx_OpCodes(private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 

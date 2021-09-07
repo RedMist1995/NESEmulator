@@ -3,7 +3,7 @@ package emulator.opCodes.rmwOpCodes;
 import emulator.hardware.CPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public class cpx_OpCodes (private val cpu: CPU) {
+public open class cpx_OpCodes (private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 

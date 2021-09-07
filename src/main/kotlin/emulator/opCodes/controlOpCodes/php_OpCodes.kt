@@ -5,7 +5,7 @@ import emulator.hardware.CPU;
 import emulator.hardware.PPU;
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class php_OpCodes(private val cpu: CPU) {
+open class php_OpCodes(private val cpu: CPU) {
 
     //OP Codes - PHP Group
     fun OP_08(){

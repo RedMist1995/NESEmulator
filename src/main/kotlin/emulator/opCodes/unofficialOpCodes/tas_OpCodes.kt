@@ -5,14 +5,14 @@ import emulator.hardware.CPU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class tas_OpCodes(private val cpu: CPU) {
+open class tas_OpCodes(private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 
     //OP Codes - CMP Group
     //Addressing Modes
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
-    fun OP_8B(){
+    fun OP_9B(){
         addressLow = cpu.ram[cpu.programCounterRegister.toInt()];//pc+1
         cpu.incrementProgramCounter(); //pc+2
         addressHigh = cpu.ram[cpu.programCounterRegister.toInt()];//pc+2

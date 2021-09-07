@@ -5,7 +5,7 @@ import emulator.hardware.CPU;
 import emulator.hardware.PPU;
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class sed_OpCodes(private val cpu: CPU) {
+open class sed_OpCodes(private val cpu: CPU) {
 
     //OP Codes - SED Group
 

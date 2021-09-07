@@ -5,7 +5,7 @@ import emulator.hardware.CPU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public class rts_OpCodes (private val cpu: CPU) {
+public open class rts_OpCodes (private val cpu: CPU) {
 
     //OP Codes - RTS Group
     fun OP_60(){

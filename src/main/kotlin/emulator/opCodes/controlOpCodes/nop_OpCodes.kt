@@ -5,7 +5,7 @@ import emulator.hardware.CPU;
 import emulator.hardware.PPU;
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class nop_OpCodes(private val cpu: CPU) {
+open class nop_OpCodes(private val cpu: CPU) {
 
     fun OP_04(){
 

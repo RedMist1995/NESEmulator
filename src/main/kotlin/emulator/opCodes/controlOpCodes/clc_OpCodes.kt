@@ -5,7 +5,7 @@ import emulator.hardware.CPU;
 import emulator.hardware.PPU;
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class clc_OpCodes(private val cpu: CPU) {
+open class clc_OpCodes(private val cpu: CPU) {
 
     //OP Codes - CLC Group
     fun OP_18() {

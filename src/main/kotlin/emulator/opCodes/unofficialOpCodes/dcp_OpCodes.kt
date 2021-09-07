@@ -6,7 +6,7 @@ import emulator.hardware.PPU
 import kotlin.experimental.and
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public class dcp_OpCodes (private val cpu: CPU) {
+public open class dcp_OpCodes (private val cpu: CPU) {
     private var addressLow: UByte = 0u;
     private var addressHigh: UByte = 0u;
 
