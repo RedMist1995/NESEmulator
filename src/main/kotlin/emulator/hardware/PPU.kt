@@ -1,4 +1,4 @@
-package emulator.hardware;
+package emulator.hardware
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class PPU {

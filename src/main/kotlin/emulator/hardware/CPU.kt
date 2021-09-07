@@ -1,4 +1,4 @@
-package emulator.hardware;
+package emulator.hardware
 @OptIn(ExperimentalUnsignedTypes::class)
 open class CPU() {
     //CPU Components
@@ -13,13 +13,13 @@ open class CPU() {
 
     //CPU Registers
     var programCounterRegister: UShort = 0u
-    var stackPointerRegister: UByte = 0u;
-    var accumulatorRegister: UByte = 0u;
-    var indexXRegister: UByte = 0u;
-    var indexYRegister: UByte = 0u;
+    var stackPointerRegister: UByte = 0u
+    var accumulatorRegister: UByte = 0u
+    var indexXRegister: UByte = 0u
+    var indexYRegister: UByte = 0u
 
     //Current Op Code
-    var opCode: UByte = 0u;
+    var opCode: UByte = 0u
 
     //Stack starts at highest section of memory allocated for stack
     var stackStart: UShort = 0x01FFu
@@ -28,99 +28,103 @@ open class CPU() {
     var cycles: Int = 0
 
     //Processor Status Flags
-//    carryFlag = [0];
-//    zeroFlag = [1];
-//    interruptDisableFlag = [2];
-//    decimalModeFlag = [3]; shouldn't be used in the NES
-//    breakCommandFlag = [4];
-//    expansionBit = [5]; Should never be used, assumed to be 1 at all times
-//    overflowFlag = [6];
-//    negativeFlag = [7];
+//    carryFlag = [0]
+//    zeroFlag = [1]
+//    interruptDisableFlag = [2]
+//    decimalModeFlag = [3] shouldn't be used in the NES
+//    breakCommandFlag = [4]
+//    expansionBit = [5] Should never be used, assumed to be 1 at all times
+//    overflowFlag = [6]
+//    negativeFlag = [7]
     var processorStatusArray = UByteArray(8)
     init {
         processorStatusArray[5] = 1u
     }
 
-    fun setCarryFlag(varue:UByte){
-        processorStatusArray[0] = varue;
+    fun setCarryFlag(value:UByte){
+        processorStatusArray[0] = value
     }
     fun resetCarryFlag(){
-        processorStatusArray[0] = 0u;
+        processorStatusArray[0] = 0u
     }
     fun getCarryFlag(): UByte{
-        return processorStatusArray[0];
+        return processorStatusArray[0]
     }
 
-    fun setZeroFlag(varue: UByte){
-        processorStatusArray[1] = varue;
+    fun setZeroFlag(value: UByte){
+        processorStatusArray[1] = value
     }
     fun resetZeroFlag(){
-        processorStatusArray[1] = 0u;
+        processorStatusArray[1] = 0u
     }
     fun getZeroFlag(): UByte{
-        return processorStatusArray[1];
+        return processorStatusArray[1]
     }
 
-    fun setInterruptDisableFlag(varue: UByte){
-        processorStatusArray[2] = varue;
+    fun setInterruptDisableFlag(value: UByte){
+        processorStatusArray[2] = value
     }
     fun resetInterruptDisableFlag(){
-        processorStatusArray[2] = 0u;
+        processorStatusArray[2] = 0u
     }
     fun getIntteruptDisableFlag(): UByte{
-        return processorStatusArray[2];
+        return processorStatusArray[2]
     }
 
-    fun setDecimalModeFlag(varue: UByte){
-        processorStatusArray[3] = varue;
+    fun setDecimalModeFlag(value: UByte){
+        processorStatusArray[3] = value
     }
     fun resetDecimalModeFlag(){
-        processorStatusArray[3] = 0u;
+        processorStatusArray[3] = 0u
     }
     fun getDecimalModeFlag(): UByte{
-        return processorStatusArray[3];
+        return processorStatusArray[3]
     }
 
-    fun setBreakCommandFlag(varue: UByte){
-        processorStatusArray[4] = varue;
+    fun setBreakCommandFlag(value: UByte){
+        processorStatusArray[4] = value
     }
     fun resetBreakCommandFlag(){
-        processorStatusArray[4] = 0u;
+        processorStatusArray[4] = 0u
     }
     fun getBreakCommandFlag(): UByte{
-        return processorStatusArray[4];
+        return processorStatusArray[4]
     }
 
-    fun setOverflowFlag(varue: UByte){
-        processorStatusArray[6] = varue;
+    fun setOverflowFlag(value: UByte){
+        processorStatusArray[6] = value
     }
     fun resetOverflowFlag(){
-        processorStatusArray[6] = 0u;
+        processorStatusArray[6] = 0u
     }
     fun getOverflowFlag(): UByte{
-        return processorStatusArray[6];
+        return processorStatusArray[6]
     }
 
-    fun setNegativeFlag(varue: UByte){
-        processorStatusArray[7] = varue;
+    fun setNegativeFlag(value: UByte){
+        processorStatusArray[7] = value
     }
     fun resetNegativeFlag(){
-        processorStatusArray[7] = 0u;
+        processorStatusArray[7] = 0u
     }
     fun getNegativeFLag(): UByte{
-        return processorStatusArray[7];
+        return processorStatusArray[7]
     }
 
     //increments the program counter by 1 after a memory fetch operation using the program counter is performed
     fun incrementProgramCounter(){
-        programCounterRegister = (programCounterRegister + 1u).toUShort();
+        programCounterRegister = (programCounterRegister + 1u).toUShort()
     }
 
     fun decrementStackPointer(){
-        stackPointerRegister = (stackPointerRegister - 1u).toUByte();
+        stackPointerRegister = (stackPointerRegister - 1u).toUByte()
     }
 
     fun incrementStackPointer(){
-        stackPointerRegister = (stackPointerRegister + 1u).toUByte();
+        stackPointerRegister = (stackPointerRegister + 1u).toUByte()
+    }
+    
+    fun incrementClockCycle(value: Int){
+        cycles += value
     }
 }

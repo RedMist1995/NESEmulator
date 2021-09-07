@@ -1,4 +1,4 @@
-package emulator.opCodes;
+package emulator.opCodes
 
 import emulator.hardware.CPU
 import emulator.opCodes.aluOpCodes.*
@@ -297,7 +297,7 @@ class OpCodeDecoder(val cpu: CPU) {
 
             //DEC Ops
             0xC6u.toUByte() -> dec.OP_C6()
-            0xC8u.toUByte() -> dec.OP_C8()
+            0x88u.toUByte() -> dec.OP_88()
             0xCAu.toUByte() -> dec.OP_CA()
             0xCEu.toUByte() -> dec.OP_CE()
             0xD6u.toUByte() -> dec.OP_D6()

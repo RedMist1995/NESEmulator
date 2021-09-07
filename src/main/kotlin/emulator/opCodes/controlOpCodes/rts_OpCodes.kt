@@ -1,4 +1,4 @@
-package emulator.opCodes.controlOpCodes;
+package emulator.opCodes.controlOpCodes
 
 import emulator.hardware.APU
 import emulator.hardware.CPU
