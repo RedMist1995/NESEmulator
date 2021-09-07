@@ -9,7 +9,7 @@ open class CPU() {
     //$4020 to $5FFF is expansionRom
     //$6000 to $7FFF is saveRam
     //$8000 to $FFFF is prog rom
-    var ram = UByteArray(65535)
+    var ram = UByteArray(65536)
 
     //CPU Registers
     var programCounterRegister: UShort = 0u
@@ -23,6 +23,9 @@ open class CPU() {
 
     //Stack starts at highest section of memory allocated for stack
     var stackStart: UShort = 0x01FFu
+
+    //CPU Cycle Counter
+    var cycles: Int = 0
 
     //Processor Status Flags
 //    carryFlag = [0];
