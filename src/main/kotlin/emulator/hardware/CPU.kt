@@ -11,6 +11,8 @@ open class CPU() {
     //$8000 to $FFFF is prog rom
     var ram = UByteArray(65536)
 
+    var romHeader = UByteArray(16)
+
     //CPU Registers
     var programCounterRegister: UShort = 0u
     var stackPointerRegister: UByte = 0u

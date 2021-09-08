@@ -4,37 +4,24 @@ package emulator.hardware
 class PPU {
     //PPU Components
     //Memory Map
-    //$0000 to $0FFF
-    private var patternTable0 = UByteArray(4096)
-    //$1000 to $1FFF
-    private var patternTable1 = UByteArray(4096)
-    //$2000 to $23BF
-    private var nameTable0 = UByteArray(960)
-    //$23C0 to $23FF
-    private var attributeTable0 = UByteArray(64)
-    //$2400 to $273BF
-    private var nameTable1 = UByteArray(960)
-    //$27C0 to $27FF
-    private var attributeTable1 = UByteArray(64)
-    //$2800 to $2BBF
-    private var nameTable2 = UByteArray(960)
-    //$2BCO to $2BFF
-    private var attributeTable2 = UByteArray(64)
-    //$2C00 to $2FBF
-    private var nameTable3 = UByteArray(960)
-    //$2FC0 to $2FFF
-    private var attributeTable3 = UByteArray(64)
-    //$3000 to $3EFF
-    private var memoryTable1 = UByteArray(3840)
-    //$3F00 to $3F0F
-    private var bgPallete = UByteArray(16)
-    //$3F10 to $3F1F
-    private var spritePallete = UByteArray(16)
-    //$3F20 to $3FFF
-    private var mirrorTable3 = UByteArray(224)
+    //$0000 to $0FFF patternTable0
+    //$1000 to $1FFF patternTable1
+    //$2000 to $23BF nameTable0
+    //$23C0 to $23FF attributeTable0
+    //$2400 to $273BF nameTable1
+    //$27C0 to $27FF attributeTable1
+    //$2800 to $2BBF nameTable2
+    //$2BCO to $2BFF attributeTable2
+    //$2C00 to $2FBF nameTable3
+    //$2FC0 to $2FFF attributeTable3
+    //$3000 to $3EFF memoryTable1
+    //$3F00 to $3F0F bgPallete
+    //$3F10 to $3F1F spritePallete
+    //$3F20 to $3FFF mirrorTable3
+    var ram = UByteArray(16384)
 
     //Special Internal PPU Address Map for Sprite Rendering
-    private var objectAttributeMemory = UByteArray(256)
+    var objectAttributeMemory = UByteArray(256)
 
     //PPU Registers
     //PPU CTRL - PPU control register Access: write
