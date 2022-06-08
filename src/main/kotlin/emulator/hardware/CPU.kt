@@ -27,7 +27,8 @@ open class CPU() {
     var stackStart: UShort = 0x01FFu
 
     //CPU Cycle Counter
-    var cycles: Int = 0
+    var cycles: Int = 2
+    var fullCycles: Int = 2
 
     //Processor Status Flags
 //    carryFlag = [0]
@@ -38,8 +39,10 @@ open class CPU() {
 //    expansionBit = [5] Should never be used, assumed to be 1 at all times
 //    overflowFlag = [6]
 //    negativeFlag = [7]
+    var processorStatusValue: UByte = 24u
     var processorStatusArray = UByteArray(8)
     init {
+        processorStatusArray[4] = 1u
         processorStatusArray[5] = 1u
     }
 

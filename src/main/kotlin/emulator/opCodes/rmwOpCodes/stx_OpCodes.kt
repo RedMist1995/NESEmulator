@@ -2,10 +2,11 @@ package emulator.opCodes.rmwOpCodes
 
 import emulator.hardware.APU
 import emulator.hardware.CPU
+import emulator.hardware.MMU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public open class stx_OpCodes (private val cpu: CPU) {
+public open class stx_OpCodes (private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -13,12 +14,12 @@ public open class stx_OpCodes (private val cpu: CPU) {
     //Addressing Modes
     //Immediate Addressing - Doesn't pull data from memory, uses OP Parameter as data
     fun OP_82(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
     }
     //Zero Page Addressing - assumes Address High to be 0x00
     fun OP_86(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
         val zeroPageAddress: UShort = addressLow.toUShort()
         storeXInto(zeroPageAddress)
@@ -31,9 +32,9 @@ public open class stx_OpCodes (private val cpu: CPU) {
     }
     //Absolute Addressing - Pulls addressLow and addressHigh from OP Params 1 and 2, combines to make 16bit mem address to pull data from
     fun OP_8E(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()] //pc+2
+        addressHigh = mmu.readFromMemory(cpu.programCounterRegister) //pc+2
         cpu.incrementProgramCounter() //pc+3
 
         val src: UShort = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort()
@@ -42,15 +43,15 @@ public open class stx_OpCodes (private val cpu: CPU) {
     }
     //Indirect Indexed
     fun OP_96(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc + 1 initial low address from OP Code Parameter
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc + 1 initial low address from OP Code Parameter
         cpu.incrementProgramCounter()//pc + 2
         val zeroPageAddress: UShort = (addressLow + 1u).toUShort()
         val indirectIndexedAddress: UShort
         if(zeroPageAddress <= 0xFFu){
-            addressHigh = cpu.ram[zeroPageAddress.toInt()]
+            addressHigh = mmu.readFromMemory(zeroPageAddress)
             indirectIndexedAddress = ((addressHigh.toInt() shl 8) + (zeroPageAddress.toInt() + cpu.indexYRegister.toInt())).toUShort()
         } else {
-            addressHigh = cpu.ram[zeroPageAddress.toInt()]
+            addressHigh = mmu.readFromMemory(zeroPageAddress)
             indirectIndexedAddress = (((addressHigh.toInt() + 1) shl 8) + (zeroPageAddress.toInt() + cpu.indexXRegister.toInt())).toUShort()
         }
 
@@ -71,7 +72,7 @@ public open class stx_OpCodes (private val cpu: CPU) {
                 cpu.stackPointerRegister = cpu.indexXRegister
             }
         } else {
-            cpu.ram[memory.toInt()] = cpu.indexXRegister
+            mmu.writeToMemory(memory, cpu.indexXRegister)
         }
         if(cpu.indexXRegister.toUInt() == 0u){
             cpu.setZeroFlag(1u)

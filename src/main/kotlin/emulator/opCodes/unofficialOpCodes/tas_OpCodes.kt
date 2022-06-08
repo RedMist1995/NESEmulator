@@ -2,10 +2,11 @@ package emulator.opCodes.unofficialOpCodes
 
 import emulator.hardware.APU
 import emulator.hardware.CPU
+import emulator.hardware.MMU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-open class tas_OpCodes(private val cpu: CPU) {
+open class tas_OpCodes(private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -13,9 +14,9 @@ open class tas_OpCodes(private val cpu: CPU) {
     //Addressing Modes
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_9B(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc+1
         cpu.incrementProgramCounter() //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]//pc+2
+        addressHigh = mmu.readFromMemory(cpu.programCounterRegister)//pc+2
         cpu.incrementProgramCounter()//pc+3
 
         val src: UShort
@@ -28,8 +29,6 @@ open class tas_OpCodes(private val cpu: CPU) {
         cpu.incrementClockCycle(5)
     }
 
-    
-
     //No Good Method Name. This opcode ANDs the contents of the A and X registers (without changing
     //the contents of either register) and transfers the result to the stack
     //pointer.  It then ANDs that result with the contents of the high byte of
@@ -37,7 +36,7 @@ open class tas_OpCodes(private val cpu: CPU) {
     //memory.
     fun tasOperation(address: UShort){
         cpu.stackPointerRegister = cpu.accumulatorRegister and cpu.indexXRegister
-        val temp: UByte = cpu.stackPointerRegister and cpu.ram[addressHigh.toInt() + 1]
-        cpu.ram[address.toInt()] = temp
+        val temp: UByte = cpu.stackPointerRegister and mmu.readFromMemory((addressHigh.toInt() + 1).toUShort())
+        mmu.writeToMemory(address, temp)
     }
 }

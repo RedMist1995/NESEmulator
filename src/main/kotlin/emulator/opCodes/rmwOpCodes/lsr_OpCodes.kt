@@ -2,10 +2,11 @@ package emulator.opCodes.rmwOpCodes
 
 import emulator.hardware.APU
 import emulator.hardware.CPU
+import emulator.hardware.MMU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public open class lsr_OpCodes(private val cpu: CPU) {
+public open class lsr_OpCodes(private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -13,7 +14,7 @@ public open class lsr_OpCodes(private val cpu: CPU) {
     //Addressing Modes
     //Indexed Indirect
     fun OP_46(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
         val zeroPageAddress: UShort = addressLow.toUShort()
         logicalShiftRight(zeroPageAddress)
@@ -21,16 +22,16 @@ public open class lsr_OpCodes(private val cpu: CPU) {
     }
     //Accumulator Shift
     fun OP_4A(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
         logicalShiftRight(null)
         cpu.incrementClockCycle(2)
     }
     //Absolute Addressing - Pulls addressLow and addressHigh from OP Params 1 and 2, combines to make 16bit mem address to pull data from
     fun OP_4E(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()] //pc+2
+        addressHigh = mmu.readFromMemory(cpu.programCounterRegister) //pc+2
         cpu.incrementProgramCounter() //pc+3
 
         val src: UShort = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort()
@@ -39,7 +40,7 @@ public open class lsr_OpCodes(private val cpu: CPU) {
     }
     //Zero Page Indexed Addressing - only index x is allowed with Zero Page indexing, and regardless of a carry with the addressLow + indexX the high address will always be 0x0000
     fun OP_56(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc+1
         cpu.incrementProgramCounter() //pc+2
 
         val zeroPageAddress: UShort
@@ -55,9 +56,9 @@ public open class lsr_OpCodes(private val cpu: CPU) {
     }
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_5E(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc+1
         cpu.incrementProgramCounter() //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]//pc+2
+        addressHigh = mmu.readFromMemory(cpu.programCounterRegister)//pc+2
         cpu.incrementProgramCounter()//pc+3
 
         val src: UShort
@@ -80,10 +81,10 @@ public open class lsr_OpCodes(private val cpu: CPU) {
             cpu.accumulatorRegister = temp
             cpu.setCarryFlag(newCarry)
         } else {
-            val src: UByte = cpu.ram[address.toInt()]
+            val src: UByte = mmu.readFromMemory(address)
             val newCarry: UByte = src and 1u
             temp = ((src.toInt() shr 1) and 0xFF).toUByte()
-            cpu.ram[address.toInt()] = temp
+            mmu.writeToMemory(address, temp)
             cpu.setCarryFlag(newCarry)
         }
         cpu.resetNegativeFlag()

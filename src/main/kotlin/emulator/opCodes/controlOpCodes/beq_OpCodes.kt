@@ -1,11 +1,11 @@
 package emulator.opCodes.controlOpCodes
 
-import emulator.hardware.APU
+import emulator.debug.debugWriter
 import emulator.hardware.CPU
-import emulator.hardware.PPU
+import emulator.hardware.MMU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-open class beq_OpCodes(private val cpu: CPU) {
+open class beq_OpCodes(private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -13,8 +13,10 @@ open class beq_OpCodes(private val cpu: CPU) {
     //Addressing Modes
     //Indexed Indirect
     fun OP_F0(){
+        debugWriter.writeProgramCounter()
+        debugWriter.writeOPCode("F0")
         if(cpu.getZeroFlag().toUInt() == 0u) {
-            val temp: UByte = cpu.ram[cpu.programCounterRegister.toInt()]
+            val temp: UByte = mmu.readFromMemory(cpu.programCounterRegister)
             val newPC: UShort
             if(temp.toUInt() and 128u != 0u) {
                 val posTemp: UByte = (temp.inv() + 1u).toUByte()
@@ -22,6 +24,8 @@ open class beq_OpCodes(private val cpu: CPU) {
             } else {
                 newPC = (cpu.programCounterRegister + temp).toUShort()
             }
+            debugWriter.writeLowAddress(newPC.toInt())
+            debugWriter.writeHighAddress(null, newPC.toInt(), "BEQ")
             if((newPC.toUInt()/256u) == (cpu.programCounterRegister.toUInt()/256u)){
                 cpu.incrementClockCycle(3)
             } else {

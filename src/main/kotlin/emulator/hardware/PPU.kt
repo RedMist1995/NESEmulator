@@ -23,23 +23,29 @@ class PPU {
     //Special Internal PPU Address Map for Sprite Rendering
     var objectAttributeMemory = UByteArray(256)
 
+    var cycles: Int = 0
+    var scanline: Int = 0
+    var nmiFlag: Boolean = false
+
     //PPU Registers
     //PPU CTRL - PPU control register Access: write
-    private var ppuCtrl: UByte = 0u
+    var ppuCtrl: UByte = 0u
     //PPU MASK - Description: PPU mask register Access: write
-    private var ppuMask: UByte = 0u
+    var ppuMask: UByte = 0u
     //PPU STATUS - Description: PPU status register Access: read
-    private var ppuStatus: UByte = 0u
+    var ppuStatus: UByte = 0u
     //OAM ADDR - Description: OAM address port Access: write
-    private var oamAddr: UByte = 0u
+    var oamAddr: UByte = 0u
     //OAM DATA - Description: OAM data port Access: read, write
-    private var oamData: UByte = 0u
+    var oamData: UByte = 0u
     //PPU SCROLL - Description: PPU scrolling position register Access: write twice
-    private var ppuScroll: UByte = 0u
+    var ppuScroll: UByte = 0u
     //PPU ADDR - Description: PPU address register Access: write twice
-    private var ppuAddr: UByte = 0u
+    var ppuAddr: UShort = 0u
+    //PPU Addr must be written too twice before the address is stored
+    var ppuAddrWrite: Int = 0
     //PPU DATA - Description: PPU data port Access: read, write
-    private var ppuData: UByte = 0u
+    var ppuData: UByte = 0u
     //OAMDMA Description: OAM DMA register (high byte) Access: write
-    private var oamDma: UByte = 0u
+    var oamDma: UByte = 0u
 }

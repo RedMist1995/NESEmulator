@@ -1,11 +1,11 @@
 package emulator.opCodes.aluOpCodes
 
-import emulator.hardware.APU
+import emulator.debug.debugWriter
 import emulator.hardware.CPU
-import emulator.hardware.PPU
+import emulator.hardware.MMU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public open class sta_OpCodes (private val cpu: CPU) {
+public open class sta_OpCodes(private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -115,6 +115,6 @@ public open class sta_OpCodes (private val cpu: CPU) {
     
     
     fun storeAccumulatorInMemory(address: UShort){
-        cpu.ram[address.toInt()] = cpu.accumulatorRegister
+        mmu.writeToMemory(address, cpu.accumulatorRegister)
     }
 }

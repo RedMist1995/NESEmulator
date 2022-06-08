@@ -2,10 +2,11 @@ package emulator.opCodes.unofficialOpCodes
 
 import emulator.hardware.APU
 import emulator.hardware.CPU
+import emulator.hardware.MMU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public open class las_OpCodes (private val cpu: CPU) {
+public open class las_OpCodes (private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -14,9 +15,9 @@ public open class las_OpCodes (private val cpu: CPU) {
     //Addressing Modes
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_BB(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc+1
         cpu.incrementProgramCounter() //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]//pc+2
+        addressHigh = mmu.readFromMemory(cpu.programCounterRegister)//pc+2
         cpu.incrementProgramCounter()//pc+3
 
         val src: UShort
@@ -31,14 +32,12 @@ public open class las_OpCodes (private val cpu: CPU) {
         andMemorySPStoreAXSP(src)
     }
 
-    
-
     fun loadAccumulator(memory: UShort){
-        cpu.accumulatorRegister = cpu.ram[memory.toInt()]
+        cpu.accumulatorRegister = mmu.readFromMemory(memory)
     }
 
     fun andMemorySPStoreAXSP(memory: UShort){
-        val temp: UByte = cpu.stackPointerRegister and cpu.ram[memory.toInt()]
+        val temp: UByte = cpu.stackPointerRegister and mmu.readFromMemory(memory)
         cpu.accumulatorRegister = temp
         cpu.indexXRegister = temp
         cpu.stackPointerRegister = temp

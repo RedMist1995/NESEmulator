@@ -1,9 +1,10 @@
 package emulator.opCodes.unofficialOpCodes
 
 import emulator.hardware.CPU
+import emulator.hardware.MMU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-open class shx_OpCodes(private val cpu: CPU) {
+open class shx_OpCodes(private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -11,9 +12,9 @@ open class shx_OpCodes(private val cpu: CPU) {
     //Addressing Modes
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_9E(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc+1
         cpu.incrementProgramCounter() //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]//pc+2
+        addressHigh = mmu.readFromMemory(cpu.programCounterRegister)//pc+2
         cpu.incrementProgramCounter()//pc+3
 
         val src: UShort
@@ -28,6 +29,6 @@ open class shx_OpCodes(private val cpu: CPU) {
 
     //Actual Add With Carry Operation
     fun andXHStoreMemory(address: UShort){
-        cpu.ram[address.toInt()] = cpu.indexXRegister and cpu.ram[addressHigh.toInt()]
+        mmu.writeToMemory(address, cpu.indexXRegister and mmu.readFromMemory(addressHigh.toUShort()))
     }
 }

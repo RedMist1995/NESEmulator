@@ -1,13 +1,10 @@
 package emulator.opCodes.controlOpCodes
 
-import emulator.hardware.APU
+import emulator.debug.debugWriter
 import emulator.hardware.CPU
-import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-open class tya_OpCodes(private val cpu: CPU) {
-    private var addressLow: UByte = 0u
-    private var addressHigh: UByte = 0u
+open class tya_OpCodes(private val cpu: CPU, val debugWriter: debugWriter) {
 
     //OP Codes - TYA Group
     fun OP_A8(){

@@ -2,10 +2,11 @@ package emulator.opCodes.controlOpCodes
 
 import emulator.hardware.APU
 import emulator.hardware.CPU
+import emulator.hardware.MMU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-open class bvs_OpCodes(private val cpu: CPU) {
+open class bvs_OpCodes(private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -14,7 +15,7 @@ open class bvs_OpCodes(private val cpu: CPU) {
     //Indexed Indirect
     fun OP_70(){
         if(cpu.getOverflowFlag().toUInt() == 1u) {
-            val temp: UByte = cpu.ram[cpu.programCounterRegister.toInt()]
+            val temp: UByte = mmu.readFromMemory(cpu.programCounterRegister)
             val newPC: UShort
             if(temp.toUInt() and 128u != 0u) {
                 val posTemp: UByte = (temp.inv() + 1u).toUByte()

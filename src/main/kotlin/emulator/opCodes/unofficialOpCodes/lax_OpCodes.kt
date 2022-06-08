@@ -2,10 +2,11 @@ package emulator.opCodes.unofficialOpCodes
 
 import emulator.hardware.APU
 import emulator.hardware.CPU
+import emulator.hardware.MMU
 import emulator.hardware.PPU
 
 @OptIn(ExperimentalUnsignedTypes::class)
-public open class lax_OpCodes (private val cpu: CPU) {
+public open class lax_OpCodes (private val cpu: CPU, private val mmu: MMU, val debugWriter: debugWriter) {
     private var addressLow: UByte = 0u
     private var addressHigh: UByte = 0u
 
@@ -14,13 +15,13 @@ public open class lax_OpCodes (private val cpu: CPU) {
     //Addressing Modes
     //Indexed Indirect
     fun OP_A3(){
-        val bal: UByte = cpu.ram[cpu.programCounterRegister.toInt()]//pc+1 initial low address from OP Parameter
+        val bal: UByte = mmu.readFromMemory(cpu.programCounterRegister)//pc+1 initial low address from OP Parameter
         cpu.incrementProgramCounter()//pc+2
         var zeroPageAddress: UShort = (bal + cpu.indexXRegister + 1u).toUShort() //creates a zero pages stand in BAL and is the real low address byte if under FF
         if(zeroPageAddress > 0xFFu) {
             zeroPageAddress = (zeroPageAddress - 0x100u).toUShort()//creates the real low address byte if over FF by stripping the carry and wrapping to the low zero page address
         }
-        addressHigh = cpu.ram[zeroPageAddress.toInt()] //gets the high address byte by accessing the memory location of the zero paged low address byte
+        addressHigh = mmu.readFromMemory(zeroPageAddress) //gets the high address byte by accessing the memory location of the zero paged low address byte
         val indexedIndirectAddress: UShort = ((addressHigh.toInt() shl 8) + zeroPageAddress.toInt()).toUShort() //creates the final indexed indirect address
         loadAccumulator(indexedIndirectAddress)
         loadIntoX(indexedIndirectAddress)
@@ -28,7 +29,7 @@ public open class lax_OpCodes (private val cpu: CPU) {
     }
     //Zero Page Addressing - assumes Address High to be 0x00
     fun OP_A7(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
         val zeroPageAddress: UShort = addressLow.toUShort()
         loadAccumulator(zeroPageAddress)
@@ -37,7 +38,7 @@ public open class lax_OpCodes (private val cpu: CPU) {
     }
     //Immediate Addressing - Doesn't pull data from memory, uses OP Parameter as data
     fun OP_AB(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
         loadAccumulator(addressLow.toUShort())
         loadIntoX(addressLow.toUShort())
@@ -45,9 +46,9 @@ public open class lax_OpCodes (private val cpu: CPU) {
     }
     //Absolute Addressing - Pulls addressLow and addressHigh from OP Params 1 and 2, combines to make 16bit mem address to pull data from
     fun OP_AF(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()] //pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister) //pc+1
         cpu.incrementProgramCounter() //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()] //pc+2
+        addressHigh = mmu.readFromMemory(cpu.programCounterRegister) //pc+2
         cpu.incrementProgramCounter() //pc+3
 
         val src: UShort = ((addressHigh.toInt() shl 8) + addressLow.toInt()).toUShort()
@@ -57,16 +58,16 @@ public open class lax_OpCodes (private val cpu: CPU) {
     }
     //Indirect Indexed
     fun OP_B3(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc + 1 initial low address from OP Code Parameter
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc + 1 initial low address from OP Code Parameter
         cpu.incrementProgramCounter()//pc + 2
         val zeroPageAddress: UShort = (addressLow + 1u).toUShort()
         val indirectIndexedAddress: UShort
         if(zeroPageAddress <= 0xFFu){
-            addressHigh = cpu.ram[zeroPageAddress.toInt()]
+            addressHigh = mmu.readFromMemory(zeroPageAddress)
             indirectIndexedAddress = ((addressHigh.toInt() shl 8) + (zeroPageAddress.toInt() + cpu.indexYRegister.toInt())).toUShort()
             cpu.incrementClockCycle(5)
         } else {
-            addressHigh = cpu.ram[zeroPageAddress.toInt()]
+            addressHigh = mmu.readFromMemory(zeroPageAddress)
             indirectIndexedAddress = (((addressHigh.toInt() + 1) shl 8) + (zeroPageAddress.toInt() + cpu.indexXRegister.toInt())).toUShort()
             cpu.incrementClockCycle(6)
         }
@@ -76,7 +77,7 @@ public open class lax_OpCodes (private val cpu: CPU) {
     }
     //Zero Page Indexed Addressing - special case where Y is used for Zero Page Indexing, and regardless of a carry with the addressLow + indexX the high address will always be 0x0000
     fun OP_B7(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc+1
         cpu.incrementProgramCounter() //pc+2
 
         val zeroPageAddress: UShort
@@ -93,9 +94,9 @@ public open class lax_OpCodes (private val cpu: CPU) {
     }
     //Absolute Y Indexed Addressing - If addressLow + indexX causes a carry (over 255) the carry is added to address High after the shift
     fun OP_BF(){
-        addressLow = cpu.ram[cpu.programCounterRegister.toInt()]//pc+1
+        addressLow = mmu.readFromMemory(cpu.programCounterRegister)//pc+1
         cpu.incrementProgramCounter() //pc+2
-        addressHigh = cpu.ram[cpu.programCounterRegister.toInt()]//pc+2
+        addressHigh = mmu.readFromMemory(cpu.programCounterRegister)//pc+2
         cpu.incrementProgramCounter()//pc+3
 
         val src: UShort
@@ -110,10 +111,8 @@ public open class lax_OpCodes (private val cpu: CPU) {
         loadIntoX(src)
     }
 
-    
-
     fun loadAccumulator(memory: UShort){
-        cpu.accumulatorRegister = cpu.ram[memory.toInt()]
+        cpu.accumulatorRegister = mmu.readFromMemory(memory)
     }
 
     fun loadIntoX(memory: UShort?){
@@ -124,7 +123,7 @@ public open class lax_OpCodes (private val cpu: CPU) {
                 cpu.indexXRegister = cpu.stackPointerRegister
             }
         } else {
-            cpu.indexXRegister = cpu.ram[memory.toInt()]
+            cpu.indexXRegister = mmu.readFromMemory(memory)
         }
         if(cpu.indexXRegister.toUInt() == 0u){
             cpu.setZeroFlag(1u)
