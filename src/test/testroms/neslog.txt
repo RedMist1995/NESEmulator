@@ -1,0 +1,1 @@
+c000  f5 c5  JMP c5f5   A:00 X:00 Y:00 P:24 SP:fd PPU:  0,  21 CYC:7

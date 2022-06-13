@@ -21,7 +21,6 @@
 *.rar
 .idea/
 out/
-src/testfiles/
 gradle/
 .gradle/
 *.DS_STORE
